@@ -1,35 +1,62 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FutureGames.JRPG_Rocket
 {
-    public enum HeroState
-    {
-        Sleeping,
-        Selected,
-        Active,
-    }
+    // public enum HeroState
+    // {
+    //     Sleeping,
+    //     Selected,
+    //     Active,
+    // }
 
     public abstract class Hero : MonoBehaviour
     {
-        protected HeroState heroState = HeroState.Sleeping;
+        [SerializeField] protected float MoveDistance = 1f;
+        [SerializeField] protected int   CommandCount = 4;
+        
+        // protected HeroState heroState = HeroState.Sleeping;
 
-        protected new GameObject gameObject = null;
+        private Queue<Action> commands = new Queue<Action>();
 
-        protected Queue<Command> commands = new Queue<Command>();
+        private void AddCommand(Action pAction)
+        {
+            commands.Enqueue(pAction);
+        }
 
-        public abstract void AddCommand(Command command);
+        public void ExecuteCommands()
+        {
+            foreach (Action a in commands)
+            {
+                a();
+            }
 
-        public abstract void ExecuteCommands();
+            commands.Clear();
+        }
 
-        public abstract void MoveForward();
-        public abstract void MoveBackward();
-        public abstract void MoveRight();
-        public abstract void MoveLeft();
+        public virtual void QueueMoveForward()
+        {
+            AddCommand(() => Move(Vector3.forward * MoveDistance));
+        }
+        public virtual void QueueMoveBackward()
+        {
+            AddCommand(() => Move(Vector3.back * MoveDistance));
+        }
 
-        public abstract void ChangeState(HeroState newState);
+        public virtual void QueueMoveRight()
+        {
+            AddCommand(() => Move(Vector3.right * MoveDistance));
+        }
 
-        protected void Move(Vector3 amount)
+        public virtual void QueueMoveLeft()
+        {
+            AddCommand(() => Move(Vector3.left * MoveDistance));
+        }
+
+        // public abstract void ChangeState(HeroState newState);
+
+        private void Move(Vector3 amount)
         {
             gameObject.transform.Translate(amount);
         }
