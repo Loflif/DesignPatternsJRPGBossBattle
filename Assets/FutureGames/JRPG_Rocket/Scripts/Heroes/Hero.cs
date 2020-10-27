@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FutureGames.JRPG_Rocket
 {
@@ -14,15 +15,21 @@ namespace FutureGames.JRPG_Rocket
     public abstract class Hero : MonoBehaviour
     {
         [SerializeField] protected float MoveDistance = 1f;
-        [SerializeField] protected int   CommandCount = 4;
-        
+        [SerializeField] protected int   CommandMax   = 4;
+
         // protected HeroState heroState = HeroState.Sleeping;
 
         private Queue<Action> commands = new Queue<Action>();
 
         private void AddCommand(Action pAction)
         {
-            commands.Enqueue(pAction);
+            if (commands.Count < CommandMax)
+                commands.Enqueue(pAction);
+        }
+
+        public void RemoveLastCommand()
+        {
+            
         }
 
         public void ExecuteCommands()
@@ -39,6 +46,7 @@ namespace FutureGames.JRPG_Rocket
         {
             AddCommand(() => Move(Vector3.forward * MoveDistance));
         }
+
         public virtual void QueueMoveBackward()
         {
             AddCommand(() => Move(Vector3.back * MoveDistance));
