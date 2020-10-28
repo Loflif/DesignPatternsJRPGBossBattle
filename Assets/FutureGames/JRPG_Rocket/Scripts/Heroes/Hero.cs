@@ -1,68 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace FutureGames.JRPG_Rocket
 {
-    // public enum HeroState
-    // {
-    //     Sleeping,
-    //     Selected,
-    //     Active,
-    // }
-
+    public struct Command
+    {
+        public Command(Action pAction, GameObject pActionVisualizer)
+        {
+            Action           = pAction;
+            ActionVisualizer = pActionVisualizer;
+        }
+        public Action     Action;
+        public GameObject ActionVisualizer;
+    }
+    
     public abstract class Hero : MonoBehaviour
     {
-        [SerializeField] protected float MoveDistance = 1f;
-        [SerializeField] protected int   CommandMax   = 4;
+        [SerializeField] protected float      MoveDistance   = 1f;
+        [SerializeField] protected int        CommandMax     = 4;
+        [SerializeField] protected GameObject MoveVisualizer = null;
+        [SerializeField] protected GameObject AttackVisualizer = null;
 
-        // protected HeroState heroState = HeroState.Sleeping;
+        private Queue<Command> Commands = new Queue<Command>();
 
-        private Queue<Action> commands = new Queue<Action>();
-
-        private void AddCommand(Action pAction)
+        private void AddCommand(Command pCommand)
         {
-            if (commands.Count < CommandMax)
-                commands.Enqueue(pAction);
+            //TODO: GetPooled visualiser and position it at where the action will take place, probably should save position if all commands go off
+            if (Commands.Count < CommandMax)
+                Commands.Enqueue(pCommand);
         }
 
         public void RemoveLastCommand()
         {
-            
+            if (Commands.Count == 0)
+                return;
+            Commands.Reverse(); //TODO: FIX!!
+            Commands.Dequeue();
+            Commands.Reverse();
         }
 
         public void ExecuteCommands()
         {
-            foreach (Action a in commands)
+            foreach (Command c in Commands)
             {
-                a();
+                c.Action();
+                //TODO: do something with the visualiser
             }
 
-            commands.Clear();
+            Commands.Clear();
         }
 
         public virtual void QueueMoveForward()
         {
-            AddCommand(() => Move(Vector3.forward * MoveDistance));
+            //TODO: Make sure you can't queue commands that put you outside the grid
+            void NewAction() => Move(Vector3.forward * MoveDistance);
+            Command newCommand = new Command(NewAction, MoveVisualizer);
+            AddCommand(newCommand);
         }
 
         public virtual void QueueMoveBackward()
         {
-            AddCommand(() => Move(Vector3.back * MoveDistance));
+            void NewAction() => Move(Vector3.back * MoveDistance);
+            Command newCommand = new Command(NewAction, MoveVisualizer);
+            AddCommand(newCommand);
         }
 
         public virtual void QueueMoveRight()
         {
-            AddCommand(() => Move(Vector3.right * MoveDistance));
+            void NewAction() => Move(Vector3.right * MoveDistance);
+            Command newCommand = new Command(NewAction, MoveVisualizer);
+            AddCommand(newCommand);
         }
 
         public virtual void QueueMoveLeft()
         {
-            AddCommand(() => Move(Vector3.left * MoveDistance));
+            void NewAction() => Move(Vector3.left * MoveDistance);
+            Command newCommand = new Command(NewAction, MoveVisualizer);
+            AddCommand(newCommand);
         }
-
-        // public abstract void ChangeState(HeroState newState);
 
         private void Move(Vector3 amount)
         {

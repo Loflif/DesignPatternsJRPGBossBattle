@@ -57,6 +57,22 @@ public class @CommandInput : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""ChangeSelectedHero"",
+                    ""type"": ""Value"",
+                    ""id"": ""f34ccff4-53e6-4621-9636-97c9e505b651"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""RemoveLastCommand"",
+                    ""type"": ""Button"",
+                    ""id"": ""a0ed2267-9cfc-4607-ae64-472705b11918"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -77,7 +93,7 @@ public class @CommandInput : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Mouse & Keyboard"",
                     ""action"": ""MoveForwards"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -99,7 +115,7 @@ public class @CommandInput : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Mouse & Keyboard"",
                     ""action"": ""MoveBackwards"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -121,7 +137,7 @@ public class @CommandInput : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Mouse & Keyboard"",
                     ""action"": ""MoveLeft"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -143,7 +159,7 @@ public class @CommandInput : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Mouse & Keyboard"",
                     ""action"": ""MoveRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -156,6 +172,28 @@ public class @CommandInput : IInputActionCollection, IDisposable
                     ""processors"": """",
                     ""groups"": ""Mouse & Keyboard"",
                     ""action"": ""MoveRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ecb0512b-534d-4572-837b-83d3b89a192b"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse & Keyboard"",
+                    ""action"": ""ChangeSelectedHero"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6b335b1e-a579-4b6b-a295-d6e13f97d6e2"",
+                    ""path"": ""<Keyboard>/backspace"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse & Keyboard"",
+                    ""action"": ""RemoveLastCommand"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -188,6 +226,8 @@ public class @CommandInput : IInputActionCollection, IDisposable
         m_PlayerOne_MoveBackwards = m_PlayerOne.FindAction("MoveBackwards", throwIfNotFound: true);
         m_PlayerOne_MoveLeft = m_PlayerOne.FindAction("MoveLeft", throwIfNotFound: true);
         m_PlayerOne_MoveRight = m_PlayerOne.FindAction("MoveRight", throwIfNotFound: true);
+        m_PlayerOne_ChangeSelectedHero = m_PlayerOne.FindAction("ChangeSelectedHero", throwIfNotFound: true);
+        m_PlayerOne_RemoveLastCommand = m_PlayerOne.FindAction("RemoveLastCommand", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -242,6 +282,8 @@ public class @CommandInput : IInputActionCollection, IDisposable
     private readonly InputAction m_PlayerOne_MoveBackwards;
     private readonly InputAction m_PlayerOne_MoveLeft;
     private readonly InputAction m_PlayerOne_MoveRight;
+    private readonly InputAction m_PlayerOne_ChangeSelectedHero;
+    private readonly InputAction m_PlayerOne_RemoveLastCommand;
     public struct PlayerOneActions
     {
         private @CommandInput m_Wrapper;
@@ -251,6 +293,8 @@ public class @CommandInput : IInputActionCollection, IDisposable
         public InputAction @MoveBackwards => m_Wrapper.m_PlayerOne_MoveBackwards;
         public InputAction @MoveLeft => m_Wrapper.m_PlayerOne_MoveLeft;
         public InputAction @MoveRight => m_Wrapper.m_PlayerOne_MoveRight;
+        public InputAction @ChangeSelectedHero => m_Wrapper.m_PlayerOne_ChangeSelectedHero;
+        public InputAction @RemoveLastCommand => m_Wrapper.m_PlayerOne_RemoveLastCommand;
         public InputActionMap Get() { return m_Wrapper.m_PlayerOne; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -275,6 +319,12 @@ public class @CommandInput : IInputActionCollection, IDisposable
                 @MoveRight.started -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnMoveRight;
                 @MoveRight.performed -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnMoveRight;
                 @MoveRight.canceled -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnMoveRight;
+                @ChangeSelectedHero.started -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnChangeSelectedHero;
+                @ChangeSelectedHero.performed -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnChangeSelectedHero;
+                @ChangeSelectedHero.canceled -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnChangeSelectedHero;
+                @RemoveLastCommand.started -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRemoveLastCommand;
+                @RemoveLastCommand.performed -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRemoveLastCommand;
+                @RemoveLastCommand.canceled -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRemoveLastCommand;
             }
             m_Wrapper.m_PlayerOneActionsCallbackInterface = instance;
             if (instance != null)
@@ -294,6 +344,12 @@ public class @CommandInput : IInputActionCollection, IDisposable
                 @MoveRight.started += instance.OnMoveRight;
                 @MoveRight.performed += instance.OnMoveRight;
                 @MoveRight.canceled += instance.OnMoveRight;
+                @ChangeSelectedHero.started += instance.OnChangeSelectedHero;
+                @ChangeSelectedHero.performed += instance.OnChangeSelectedHero;
+                @ChangeSelectedHero.canceled += instance.OnChangeSelectedHero;
+                @RemoveLastCommand.started += instance.OnRemoveLastCommand;
+                @RemoveLastCommand.performed += instance.OnRemoveLastCommand;
+                @RemoveLastCommand.canceled += instance.OnRemoveLastCommand;
             }
         }
     }
@@ -314,5 +370,7 @@ public class @CommandInput : IInputActionCollection, IDisposable
         void OnMoveBackwards(InputAction.CallbackContext context);
         void OnMoveLeft(InputAction.CallbackContext context);
         void OnMoveRight(InputAction.CallbackContext context);
+        void OnChangeSelectedHero(InputAction.CallbackContext context);
+        void OnRemoveLastCommand(InputAction.CallbackContext context);
     }
 }

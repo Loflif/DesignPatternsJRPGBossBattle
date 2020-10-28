@@ -7,12 +7,9 @@ namespace FutureGames.JRPG_Rocket
     {
         private CommandInput Input = null;
 
-        private Hero SelectedHero = null;
-
         private void Awake()
         {
-            Input        = new CommandInput();
-            SelectedHero = FindObjectOfType<Hero>(); //TODO: actually change so you can select different heroes
+            Input = new CommandInput();
         }
 
         private void OnEnable()
@@ -29,45 +26,68 @@ namespace FutureGames.JRPG_Rocket
 
         private void BindInput()
         {
-            Input.PlayerOne.MoveForwards.performed    += SendMoveForwardsCommand;
-            Input.PlayerOne.MoveBackwards.performed   += SendMoveBackwardsCommand;
-            Input.PlayerOne.MoveLeft.performed        += SendMoveLeftCommand;
-            Input.PlayerOne.MoveRight.performed       += SendMoveRightCommand;
-            Input.PlayerOne.ExecuteCommands.performed += ExecuteCommands;
+            Input.PlayerOne.MoveForwards.performed       += SendMoveForwardsCommand;
+            Input.PlayerOne.MoveBackwards.performed      += SendMoveBackwardsCommand;
+            Input.PlayerOne.MoveLeft.performed           += SendMoveLeftCommand;
+            Input.PlayerOne.MoveRight.performed          += SendMoveRightCommand;
+            Input.PlayerOne.ExecuteCommands.performed    += ExecuteCommands;
+            Input.PlayerOne.ChangeSelectedHero.performed += ChangeSelectedHero;
+            Input.PlayerOne.RemoveLastCommand.performed  += RemoveLastCommand;
         }
 
         private void UnbindInput()
         {
-            Input.PlayerOne.MoveForwards.performed    -= SendMoveForwardsCommand;
-            Input.PlayerOne.MoveBackwards.performed   -= SendMoveBackwardsCommand;
-            Input.PlayerOne.MoveLeft.performed        -= SendMoveLeftCommand;
-            Input.PlayerOne.MoveRight.performed       -= SendMoveRightCommand;
-            Input.PlayerOne.ExecuteCommands.performed -= ExecuteCommands;
+            Input.PlayerOne.MoveForwards.performed       -= SendMoveForwardsCommand;
+            Input.PlayerOne.MoveBackwards.performed      -= SendMoveBackwardsCommand;
+            Input.PlayerOne.MoveLeft.performed           -= SendMoveLeftCommand;
+            Input.PlayerOne.MoveRight.performed          -= SendMoveRightCommand;
+            Input.PlayerOne.ExecuteCommands.performed    -= ExecuteCommands;
+            Input.PlayerOne.ChangeSelectedHero.performed -= ChangeSelectedHero;
+            Input.PlayerOne.RemoveLastCommand.performed  -= RemoveLastCommand;
+
         }
 
         private void SendMoveForwardsCommand(InputAction.CallbackContext pContext)
         {
-            SelectedHero.QueueMoveForward();
+            HeroManager.Instance.CurrentlySelectedHero.QueueMoveForward();
         }
 
         private void SendMoveBackwardsCommand(InputAction.CallbackContext pContext)
         {
-            SelectedHero.QueueMoveBackward();
+            HeroManager.Instance.CurrentlySelectedHero.QueueMoveBackward();
         }
 
         private void SendMoveLeftCommand(InputAction.CallbackContext pContext)
         {
-            SelectedHero.QueueMoveLeft();
+            HeroManager.Instance.CurrentlySelectedHero.QueueMoveLeft();
         }
 
         private void SendMoveRightCommand(InputAction.CallbackContext pContext)
         {
-            SelectedHero.QueueMoveRight();
+            HeroManager.Instance.CurrentlySelectedHero.QueueMoveRight();
+        }
+
+        private void RemoveLastCommand(InputAction.CallbackContext pContext)
+        {
+            HeroManager.Instance.CurrentlySelectedHero.RemoveLastCommand();
+        }
+
+        private void ChangeSelectedHero(InputAction.CallbackContext pContext)
+        {
+            float scrollValue = pContext.ReadValue<float>();
+            if (scrollValue > 0)
+            {
+                HeroManager.Instance.SelectNextHero();
+            }
+            else
+            {
+                HeroManager.Instance.SelectPreviousHero();
+            }
         }
 
         private void ExecuteCommands(InputAction.CallbackContext pContext)
         {
-            SelectedHero.ExecuteCommands();
+            HeroManager.Instance.CurrentlySelectedHero.ExecuteCommands();
         }
     }
 }

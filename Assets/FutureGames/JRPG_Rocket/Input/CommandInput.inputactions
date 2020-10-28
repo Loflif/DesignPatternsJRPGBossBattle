@@ -44,6 +44,22 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "ChangeSelectedHero",
+                    "type": "Value",
+                    "id": "f34ccff4-53e6-4621-9636-97c9e505b651",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "RemoveLastCommand",
+                    "type": "Button",
+                    "id": "a0ed2267-9cfc-4607-ae64-472705b11918",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -64,7 +80,7 @@
                     "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Mouse & Keyboard",
                     "action": "MoveForwards",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -86,7 +102,7 @@
                     "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Mouse & Keyboard",
                     "action": "MoveBackwards",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -108,7 +124,7 @@
                     "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Mouse & Keyboard",
                     "action": "MoveLeft",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -130,7 +146,7 @@
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Mouse & Keyboard",
                     "action": "MoveRight",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -143,6 +159,28 @@
                     "processors": "",
                     "groups": "Mouse & Keyboard",
                     "action": "MoveRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ecb0512b-534d-4572-837b-83d3b89a192b",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Mouse & Keyboard",
+                    "action": "ChangeSelectedHero",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6b335b1e-a579-4b6b-a295-d6e13f97d6e2",
+                    "path": "<Keyboard>/backspace",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Mouse & Keyboard",
+                    "action": "RemoveLastCommand",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

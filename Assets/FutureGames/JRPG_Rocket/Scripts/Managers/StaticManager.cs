@@ -15,7 +15,10 @@ namespace FutureGames.JRPG_Rocket
                     return actualInstance;
                 actualInstance = FindObjectOfType<T>();
 
-                actualInstance = CreateManager();
+                if (actualInstance == null)
+                {
+                    actualInstance = CreateManager();
+                }
                 return actualInstance;
             }
         }
@@ -23,10 +26,9 @@ namespace FutureGames.JRPG_Rocket
         private static T CreateManager()
         {
             GameObject managerParent = new GameObject($"{typeof(T).Name}");
-            T instance = managerParent.AddComponent<T>();
+            T          instance      = managerParent.AddComponent<T>();
             DontDestroyOnLoad(managerParent);
             return instance;
         }
     }
 }
-
