@@ -33,6 +33,8 @@ namespace FutureGames.JRPG_Rocket
             Input.PlayerOne.ExecuteCommands.performed    += ExecuteCommands;
             Input.PlayerOne.ChangeSelectedHero.performed += ChangeSelectedHero;
             Input.PlayerOne.RemoveLastCommand.performed  += RemoveLastCommand;
+            Input.PlayerOne.RotateLeft.performed         += RotateHeroLeft;
+            Input.PlayerOne.RotateRight.performed        += RotateHeroRight;
         }
 
         private void UnbindInput()
@@ -44,32 +46,48 @@ namespace FutureGames.JRPG_Rocket
             Input.PlayerOne.ExecuteCommands.performed    -= ExecuteCommands;
             Input.PlayerOne.ChangeSelectedHero.performed -= ChangeSelectedHero;
             Input.PlayerOne.RemoveLastCommand.performed  -= RemoveLastCommand;
-
+            Input.PlayerOne.RotateLeft.performed         -= RotateHeroLeft;
+            Input.PlayerOne.RotateRight.performed        -= RotateHeroRight;
         }
 
         private void SendMoveForwardsCommand(InputAction.CallbackContext pContext)
         {
-            HeroManager.Instance.CurrentlySelectedHero.QueueMoveForward();
+            HeroManager.Instance.QueueMovementForSelectedHero(Vector3.forward);
         }
 
         private void SendMoveBackwardsCommand(InputAction.CallbackContext pContext)
         {
-            HeroManager.Instance.CurrentlySelectedHero.QueueMoveBackward();
+            HeroManager.Instance.QueueMovementForSelectedHero(Vector3.back);
         }
 
         private void SendMoveLeftCommand(InputAction.CallbackContext pContext)
         {
-            HeroManager.Instance.CurrentlySelectedHero.QueueMoveLeft();
+            HeroManager.Instance.QueueMovementForSelectedHero(Vector3.left);
         }
 
         private void SendMoveRightCommand(InputAction.CallbackContext pContext)
         {
-            HeroManager.Instance.CurrentlySelectedHero.QueueMoveRight();
+            HeroManager.Instance.QueueMovementForSelectedHero(Vector3.right);
+        }
+
+        private void SendAttackCommand(InputAction.CallbackContext pContext)
+        {
+            HeroManager.Instance.QueueAttackForSelectedHero();
+        }
+
+        private void RotateHeroLeft(InputAction.CallbackContext pContext)
+        {
+            HeroManager.Instance.RotateHeroLeft();
+        }
+
+        private void RotateHeroRight(InputAction.CallbackContext pContext)
+        {
+            HeroManager.Instance.RotateHeroRight();
         }
 
         private void RemoveLastCommand(InputAction.CallbackContext pContext)
         {
-            HeroManager.Instance.CurrentlySelectedHero.RemoveLastCommand();
+            HeroManager.Instance.RemoveCommandForSelectedHero();
         }
 
         private void ChangeSelectedHero(InputAction.CallbackContext pContext)
@@ -87,7 +105,7 @@ namespace FutureGames.JRPG_Rocket
 
         private void ExecuteCommands(InputAction.CallbackContext pContext)
         {
-            HeroManager.Instance.CurrentlySelectedHero.ExecuteCommands();
+            HeroManager.Instance.ExecuteAllHeroCommands();
         }
     }
 }

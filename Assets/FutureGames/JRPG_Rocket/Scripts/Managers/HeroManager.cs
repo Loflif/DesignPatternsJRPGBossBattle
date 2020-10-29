@@ -5,14 +5,14 @@ namespace FutureGames.JRPG_Rocket
 {
     public class HeroManager : StaticManager<HeroManager>
     {
-        [System.NonSerialized] public Hero CurrentlySelectedHero = null;
-
         [SerializeField] private float SelectorBobDistance = 0.5f;
         [SerializeField] private float SelectorBobSpeed    = 2.0f;
 
         private Hero[]    Heroes;
-        private int       CurrentHeroIndex = 0;
-        private Transform SelectorObject   = null;
+        private Hero      CurrentlySelectedHero = null;
+        private int       CurrentHeroIndex      = 0;
+        private Transform SelectorObject        = null;
+
 
         private void Awake()
         {
@@ -58,5 +58,38 @@ namespace FutureGames.JRPG_Rocket
                 yield return null;
             }
         }
+
+        public void QueueMovementForSelectedHero(Vector3 pMovement)
+        {
+            CurrentlySelectedHero.QueueMovement(pMovement);
+        }
+
+        public void RemoveCommandForSelectedHero()
+        {
+            CurrentlySelectedHero.RemoveLastCommand();
+        }
+
+        public void ExecuteAllHeroCommands()
+        {
+            foreach (Hero h in Heroes)
+            {
+                h.ExecuteCommands();
+            }
+        }
+
+        public void QueueAttackForSelectedHero()
+        {
+            CurrentlySelectedHero.QueueAttack();
+        }
+
+        public void RotateHeroLeft()
+        {
+            CurrentlySelectedHero.RotateLeft();
+        }  
+        public void RotateHeroRight()
+        {
+            CurrentlySelectedHero.RotateRight();
+        }
+        
     }
 }

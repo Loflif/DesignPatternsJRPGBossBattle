@@ -207,3 +207,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveDistance: 1
   CommandMax: 4
+  MoveVisualizer: {fileID: 6350956533144559851, guid: d86287a18e4195840b2c133f8e99fd76, type: 3}
+  AttackVisualizer: {fileID: 0}

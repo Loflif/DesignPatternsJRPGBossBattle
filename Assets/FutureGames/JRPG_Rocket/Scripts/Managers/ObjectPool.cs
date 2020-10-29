@@ -30,6 +30,7 @@ namespace FutureGames.JRPG_Rocket
             if (unusedObjectExists)
             {
                 objectToReturn.transform.SetPositionAndRotation(pPosition, pRotation);
+                objectToReturn.SetActive(true);
                 return objectToReturn;
             }
             objectToReturn = GameObject.Instantiate(SourceObject, pPosition, pRotation);

@@ -111,6 +111,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveDistance: 1
   CommandMax: 4
+  MoveVisualizer: {fileID: 2125684927449550668, guid: a4b27ea2f2b0065419fd623bf4c0ba7c, type: 3}
+  AttackVisualizer: {fileID: 0}
 --- !u!1 &4829967555911729605
 GameObject:
   m_ObjectHideFlags: 0

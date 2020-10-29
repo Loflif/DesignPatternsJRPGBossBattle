@@ -8,38 +8,50 @@ namespace FutureGames.JRPG_Rocket
 {
     public struct Command
     {
-        public Command(Action pAction, GameObject pActionVisualizer)
+        public Command(Action pAction, GameObject pActionVisualizer, Vector3 pMovementChange = default)
         {
             Action           = pAction;
             ActionVisualizer = pActionVisualizer;
+            Movement         = pMovementChange;
         }
+
         public Action     Action;
+        public Vector3    Movement;
         public GameObject ActionVisualizer;
     }
-    
+
     public abstract class Hero : MonoBehaviour
     {
-        [SerializeField] protected float      MoveDistance   = 1f;
-        [SerializeField] protected int        CommandMax     = 4;
-        [SerializeField] protected GameObject MoveVisualizer = null;
+        [SerializeField] protected float      MoveDistance     = 1f;
+        [SerializeField] protected int        CommandMax       = 4;
+        [SerializeField] protected GameObject MoveVisualizer   = null;
         [SerializeField] protected GameObject AttackVisualizer = null;
 
-        private Queue<Command> Commands = new Queue<Command>();
+        private          Vector3       SimulatedPosition = Vector3.zero;
+        private          Quaternion    SimulatedRotation = Quaternion.identity;
+        private readonly List<Command> Commands          = new List<Command>();
+
+        private void Start()
+        {
+            SimulatedPosition = transform.position;
+        }
 
         private void AddCommand(Command pCommand)
         {
-            //TODO: GetPooled visualiser and position it at where the action will take place, probably should save position if all commands go off
-            if (Commands.Count < CommandMax)
-                Commands.Enqueue(pCommand);
+            Commands.Add(pCommand);
         }
 
         public void RemoveLastCommand()
         {
             if (Commands.Count == 0)
                 return;
-            Commands.Reverse(); //TODO: FIX!!
-            Commands.Dequeue();
-            Commands.Reverse();
+            int     lastIndex       = Commands.Count - 1;
+            Command unWantedCommand = Commands[lastIndex];
+            Commands.RemoveAt(lastIndex);
+            unWantedCommand.ActionVisualizer.SetActive(false);
+            SimulatedPosition -= unWantedCommand.Movement;
+            if (Commands.Count == 0)
+                SimulatedRotation = transform.rotation;
         }
 
         public void ExecuteCommands()
@@ -47,44 +59,93 @@ namespace FutureGames.JRPG_Rocket
             foreach (Command c in Commands)
             {
                 c.Action();
-                //TODO: do something with the visualiser
+                c.ActionVisualizer.SetActive(false);
+                //TODO: execute commands slowly
             }
 
             Commands.Clear();
+            SimulatedPosition  = transform.position;
+            transform.rotation = SimulatedRotation;
         }
 
-        public virtual void QueueMoveForward()
+        private bool PointIsOnGrid(Vector3 pPoint)
         {
-            //TODO: Make sure you can't queue commands that put you outside the grid
-            void NewAction() => Move(Vector3.forward * MoveDistance);
-            Command newCommand = new Command(NewAction, MoveVisualizer);
+            var     gridBounds  = GameManager.GridBounds;
+            Vector3 pointOnGrid = new Vector3(pPoint.x, gridBounds.center.y, pPoint.z);
+            return gridBounds.Contains(pointOnGrid);
+        }
+
+        private bool HasActionsLeft()
+        {
+            return Commands.Count < CommandMax;
+        }
+
+
+        private void SimulateMovement(Command pCommand)
+        {
+            SimulatedPosition += pCommand.Movement;
+        }
+
+        private GameObject GetCommandVisualiser(GameObject pVisualiser, Vector3 pCommandMovement = default)
+        {
+            return ObjectPoolManager.GetPooledObject(pVisualiser, SimulatedPosition + pCommandMovement,
+                SimulatedRotation); //TODO: make simulated rotation :)
+        }
+
+        private void ApplySimulatedRotation()
+        {
+            if (Commands.Count > 0)
+                Commands[Commands.Count -1].ActionVisualizer.transform.rotation = SimulatedRotation;
+            else
+                transform.rotation = SimulatedRotation;
+        }
+        
+        public virtual void QueueMovement(Vector3 pDirection)
+        {
+            if (!HasActionsLeft())
+                return;
+            Vector3 moveVector = SimulatedRotation * (pDirection * MoveDistance * GameManager.GridSize);
+
+            if (!PointIsOnGrid(SimulatedPosition + moveVector))
+                return;
+
+            void MoveAction() => Move(moveVector);
+            GameObject newVisualiser = GetCommandVisualiser(MoveVisualizer, moveVector);
+            Command    newCommand    = new Command(MoveAction, newVisualiser, moveVector);
+            SimulateMovement(newCommand);
             AddCommand(newCommand);
         }
 
-        public virtual void QueueMoveBackward()
+        public virtual void QueueAttack()
         {
-            void NewAction() => Move(Vector3.back * MoveDistance);
-            Command newCommand = new Command(NewAction, MoveVisualizer);
-            AddCommand(newCommand);
+            if (!HasActionsLeft())
+                return;
+
+            // void AttackAction() => Attack();
+        }
+        
+        //TODO: make functionality to select abilities on the heroes and always visualise the selected one in front of the selected hero (turn off when not selected)
+
+        public void RotateLeft()
+        {
+            SimulatedRotation *= Quaternion.Euler(0, -90, 0);
+            ApplySimulatedRotation();
         }
 
-        public virtual void QueueMoveRight()
+        public void RotateRight()
         {
-            void NewAction() => Move(Vector3.right * MoveDistance);
-            Command newCommand = new Command(NewAction, MoveVisualizer);
-            AddCommand(newCommand);
+            SimulatedRotation *= Quaternion.Euler(0, 90, 0);
+            ApplySimulatedRotation();
         }
 
-        public virtual void QueueMoveLeft()
+        private void Move(Vector3 pAmount)
         {
-            void NewAction() => Move(Vector3.left * MoveDistance);
-            Command newCommand = new Command(NewAction, MoveVisualizer);
-            AddCommand(newCommand);
+            gameObject.transform.Translate(pAmount);
         }
 
-        private void Move(Vector3 amount)
+        private void Attack(Vector3 pAttackPosition)
         {
-            gameObject.transform.Translate(amount);
+            //TODO: make attack scriptableObjects that specify size and damage and somehow damage things in that area (BoxCast?)
         }
     }
 }

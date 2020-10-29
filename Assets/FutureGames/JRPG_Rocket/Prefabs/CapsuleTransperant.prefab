@@ -59,5 +59,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: CapsuleTransperant
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5624746008577486261, guid: 3950905bf97fbda42bcbfd9728770aee, type: 3}
+    - {fileID: 5624746008577486256, guid: 3950905bf97fbda42bcbfd9728770aee, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 3950905bf97fbda42bcbfd9728770aee, type: 3}

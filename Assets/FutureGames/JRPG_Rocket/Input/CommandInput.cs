@@ -73,6 +73,30 @@ public class @CommandInput : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""352e6158-1304-46c4-bb43-6486e8f195d5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""RotateLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""7700a66c-013d-4025-9b82-93d5b2a0eca7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""RotateRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""922a4dfd-b1e4-408f-8936-e6adf91bf1bc"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -196,6 +220,39 @@ public class @CommandInput : IInputActionCollection, IDisposable
                     ""action"": ""RemoveLastCommand"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dfd61b55-3c38-4b55-9e15-a43955d160a3"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse & Keyboard"",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cd05d48b-9ee9-4ecc-af14-57f8e86ee4a6"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse & Keyboard"",
+                    ""action"": ""RotateLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""da67ef71-a2e3-45f4-b5fc-55245c163808"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse & Keyboard"",
+                    ""action"": ""RotateRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -228,6 +285,9 @@ public class @CommandInput : IInputActionCollection, IDisposable
         m_PlayerOne_MoveRight = m_PlayerOne.FindAction("MoveRight", throwIfNotFound: true);
         m_PlayerOne_ChangeSelectedHero = m_PlayerOne.FindAction("ChangeSelectedHero", throwIfNotFound: true);
         m_PlayerOne_RemoveLastCommand = m_PlayerOne.FindAction("RemoveLastCommand", throwIfNotFound: true);
+        m_PlayerOne_Attack = m_PlayerOne.FindAction("Attack", throwIfNotFound: true);
+        m_PlayerOne_RotateLeft = m_PlayerOne.FindAction("RotateLeft", throwIfNotFound: true);
+        m_PlayerOne_RotateRight = m_PlayerOne.FindAction("RotateRight", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -284,6 +344,9 @@ public class @CommandInput : IInputActionCollection, IDisposable
     private readonly InputAction m_PlayerOne_MoveRight;
     private readonly InputAction m_PlayerOne_ChangeSelectedHero;
     private readonly InputAction m_PlayerOne_RemoveLastCommand;
+    private readonly InputAction m_PlayerOne_Attack;
+    private readonly InputAction m_PlayerOne_RotateLeft;
+    private readonly InputAction m_PlayerOne_RotateRight;
     public struct PlayerOneActions
     {
         private @CommandInput m_Wrapper;
@@ -295,6 +358,9 @@ public class @CommandInput : IInputActionCollection, IDisposable
         public InputAction @MoveRight => m_Wrapper.m_PlayerOne_MoveRight;
         public InputAction @ChangeSelectedHero => m_Wrapper.m_PlayerOne_ChangeSelectedHero;
         public InputAction @RemoveLastCommand => m_Wrapper.m_PlayerOne_RemoveLastCommand;
+        public InputAction @Attack => m_Wrapper.m_PlayerOne_Attack;
+        public InputAction @RotateLeft => m_Wrapper.m_PlayerOne_RotateLeft;
+        public InputAction @RotateRight => m_Wrapper.m_PlayerOne_RotateRight;
         public InputActionMap Get() { return m_Wrapper.m_PlayerOne; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -325,6 +391,15 @@ public class @CommandInput : IInputActionCollection, IDisposable
                 @RemoveLastCommand.started -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRemoveLastCommand;
                 @RemoveLastCommand.performed -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRemoveLastCommand;
                 @RemoveLastCommand.canceled -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRemoveLastCommand;
+                @Attack.started -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnAttack;
+                @Attack.performed -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnAttack;
+                @Attack.canceled -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnAttack;
+                @RotateLeft.started -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRotateLeft;
+                @RotateLeft.performed -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRotateLeft;
+                @RotateLeft.canceled -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRotateLeft;
+                @RotateRight.started -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRotateRight;
+                @RotateRight.performed -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRotateRight;
+                @RotateRight.canceled -= m_Wrapper.m_PlayerOneActionsCallbackInterface.OnRotateRight;
             }
             m_Wrapper.m_PlayerOneActionsCallbackInterface = instance;
             if (instance != null)
@@ -350,6 +425,15 @@ public class @CommandInput : IInputActionCollection, IDisposable
                 @RemoveLastCommand.started += instance.OnRemoveLastCommand;
                 @RemoveLastCommand.performed += instance.OnRemoveLastCommand;
                 @RemoveLastCommand.canceled += instance.OnRemoveLastCommand;
+                @Attack.started += instance.OnAttack;
+                @Attack.performed += instance.OnAttack;
+                @Attack.canceled += instance.OnAttack;
+                @RotateLeft.started += instance.OnRotateLeft;
+                @RotateLeft.performed += instance.OnRotateLeft;
+                @RotateLeft.canceled += instance.OnRotateLeft;
+                @RotateRight.started += instance.OnRotateRight;
+                @RotateRight.performed += instance.OnRotateRight;
+                @RotateRight.canceled += instance.OnRotateRight;
             }
         }
     }
@@ -372,5 +456,8 @@ public class @CommandInput : IInputActionCollection, IDisposable
         void OnMoveRight(InputAction.CallbackContext context);
         void OnChangeSelectedHero(InputAction.CallbackContext context);
         void OnRemoveLastCommand(InputAction.CallbackContext context);
+        void OnAttack(InputAction.CallbackContext context);
+        void OnRotateLeft(InputAction.CallbackContext context);
+        void OnRotateRight(InputAction.CallbackContext context);
     }
 }
