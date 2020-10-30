@@ -13,7 +13,6 @@ namespace FutureGames.JRPG_Rocket
         private int       CurrentHeroIndex      = 0;
         private Transform SelectorObject        = null;
 
-
         private void Awake()
         {
             Heroes                = FindObjectsOfType<Hero>();

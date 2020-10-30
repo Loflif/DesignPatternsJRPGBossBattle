@@ -89,7 +89,7 @@ namespace FutureGames.JRPG_Rocket
         private GameObject GetCommandVisualiser(GameObject pVisualiser, Vector3 pCommandMovement = default)
         {
             return ObjectPoolManager.GetPooledObject(pVisualiser, SimulatedPosition + pCommandMovement,
-                SimulatedRotation); //TODO: make simulated rotation :)
+                SimulatedRotation);
         }
 
         private void ApplySimulatedRotation()
@@ -99,7 +99,12 @@ namespace FutureGames.JRPG_Rocket
             else
                 transform.rotation = SimulatedRotation;
         }
-        
+        //Check whether the hero has any actions left this round, otherwise don't do anything
+        //Calculates the movement based on the current simulated rotation from all previous actions queued & the requested movement direction
+        //Check whether the target is on the grid, otherwise don't do anything
+        //Create a new command and initialize it with values of the action, visualiser and movement of the command
+        //Calculate the new simulatedPosition of the round
+        //Add command to the list
         public virtual void QueueMovement(Vector3 pDirection)
         {
             if (!HasActionsLeft())
@@ -126,24 +131,25 @@ namespace FutureGames.JRPG_Rocket
         
         //TODO: make functionality to select abilities on the heroes and always visualise the selected one in front of the selected hero (turn off when not selected)
 
+        //Add -90 degrees to the simulated rotation and apply that rotation to either the hero or the last visualiser
         public void RotateLeft()
         {
             SimulatedRotation *= Quaternion.Euler(0, -90, 0);
             ApplySimulatedRotation();
         }
-
+        
         public void RotateRight()
         {
             SimulatedRotation *= Quaternion.Euler(0, 90, 0);
             ApplySimulatedRotation();
         }
-
+        
         private void Move(Vector3 pAmount)
         {
-            gameObject.transform.Translate(pAmount);
+            gameObject.transform.position += pAmount;
         }
 
-        private void Attack(Vector3 pAttackPosition)
+        private void Attack(Attack pAttack)
         {
             //TODO: make attack scriptableObjects that specify size and damage and somehow damage things in that area (BoxCast?)
         }

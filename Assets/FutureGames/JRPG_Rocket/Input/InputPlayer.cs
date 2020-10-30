@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace FutureGames.JRPG_Rocket
@@ -24,6 +25,7 @@ namespace FutureGames.JRPG_Rocket
             Input.Disable();
         }
 
+        //Subscribe input functions to the events in the inputSystem
         private void BindInput()
         {
             Input.PlayerOne.MoveForwards.performed       += SendMoveForwardsCommand;

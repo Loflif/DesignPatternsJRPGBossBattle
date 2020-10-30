@@ -7,6 +7,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1003944312441018181, guid: 3950905bf97fbda42bcbfd9728770aee, type: 3}
+      propertyPath: m_Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2093336557783821679, guid: 3950905bf97fbda42bcbfd9728770aee, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2093336557783821679, guid: 3950905bf97fbda42bcbfd9728770aee, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5624746008577486258, guid: 3950905bf97fbda42bcbfd9728770aee, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 

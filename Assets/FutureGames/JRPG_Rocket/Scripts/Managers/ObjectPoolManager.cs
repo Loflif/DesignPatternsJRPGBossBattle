@@ -11,7 +11,8 @@ namespace FutureGames.JRPG_Rocket
         {
             Pools = new Dictionary<GameObject, ObjectPool>();
         }
-
+        //Check if objectPool for requested already exists, otherwise create one
+        //Get object from objectPool
         public static GameObject GetPooledObject(GameObject pPrefab, Vector3 pPosition, Quaternion pRotation)
         {
             if (!Instance.Pools.ContainsKey(pPrefab))

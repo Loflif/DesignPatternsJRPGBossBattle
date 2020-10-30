@@ -12,7 +12,10 @@ namespace FutureGames.JRPG_Rocket
         {
             SourceObject = pMasterObject;
         }
-        
+        //Check if there is an object in pool that is disabled
+        //Otherwise create new one and add to pool
+        //Set position and rotation of object
+        //Return object
         public GameObject GetPooledObject(Vector3 pPosition, Quaternion pRotation)
         {
             GameObject objectToReturn     = null;

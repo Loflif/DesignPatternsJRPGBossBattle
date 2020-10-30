@@ -7,6 +7,9 @@ namespace FutureGames.JRPG_Rocket
     {
         private static T actualInstance;
 
+        //Return instance of manager if instance exists
+        //Otherwise attempt to find instance
+        //If instance cannot be found in scene, create new one
         public static T Instance
         {
             get
@@ -22,7 +25,9 @@ namespace FutureGames.JRPG_Rocket
                 return actualInstance;
             }
         }
-
+        
+        //Create new gameObject and attach manager to it
+        //Return manager
         private static T CreateManager()
         {
             GameObject managerParent = new GameObject($"{typeof(T).Name}");
