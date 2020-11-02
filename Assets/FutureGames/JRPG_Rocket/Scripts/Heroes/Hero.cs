@@ -22,18 +22,22 @@ namespace FutureGames.JRPG_Rocket
 
     public abstract class Hero : MonoBehaviour
     {
-        [SerializeField] protected float      MoveDistance     = 1f;
-        [SerializeField] protected int        CommandMax       = 4;
-        [SerializeField] protected GameObject MoveVisualizer   = null;
-        [SerializeField] protected GameObject AttackVisualizer = null;
+        [SerializeField] protected float      MoveDistance            = 1f;
+        [SerializeField] protected int        CommandMax              = 4;
+        [SerializeField] protected GameObject MoveVisualizer          = null;
+        [SerializeField] protected GameObject AttackVisualizer        = null;
+        [SerializeField] protected Attack     CurrentlySelectedAttack = null;
 
-        private          Vector3       SimulatedPosition = Vector3.zero;
-        private          Quaternion    SimulatedRotation = Quaternion.identity;
-        private readonly List<Command> Commands          = new List<Command>();
+        private          Vector3          SimulatedPosition = Vector3.zero;
+        private          Quaternion       SimulatedRotation = Quaternion.identity;
+        private readonly List<Command>    Commands          = new List<Command>();
+        private readonly List<GameObject> AttackVisualizers = new List<GameObject>();
 
         private void Start()
         {
-            SimulatedPosition = transform.position;
+            SimulatedPosition                        = transform.position;
+            GameObject startAttackVisualiser = PlaceAttackVisualiser(CurrentlySelectedAttack.AttackVisualiser,
+                CurrentlySelectedAttack.AttackOffset, SimulatedRotation);
         }
 
         private void AddCommand(Command pCommand)
@@ -80,6 +84,10 @@ namespace FutureGames.JRPG_Rocket
             return Commands.Count < CommandMax;
         }
 
+        private GameObject PlaceAttackVisualiser(GameObject pAttackVisualiser, Vector3 pPosition, Quaternion pRotation)
+        {
+            return ObjectPoolManager.GetPooledObject(pAttackVisualiser, pPosition, pRotation);
+        }
 
         private void SimulateMovement(Command pCommand)
         {
@@ -95,10 +103,11 @@ namespace FutureGames.JRPG_Rocket
         private void ApplySimulatedRotation()
         {
             if (Commands.Count > 0)
-                Commands[Commands.Count -1].ActionVisualizer.transform.rotation = SimulatedRotation;
+                Commands[Commands.Count - 1].ActionVisualizer.transform.rotation = SimulatedRotation;
             else
                 transform.rotation = SimulatedRotation;
         }
+
         //Check whether the hero has any actions left this round, otherwise don't do anything
         //Calculates the movement based on the current simulated rotation from all previous actions queued & the requested movement direction
         //Check whether the target is on the grid, otherwise don't do anything
@@ -128,7 +137,7 @@ namespace FutureGames.JRPG_Rocket
 
             // void AttackAction() => Attack();
         }
-        
+
         //TODO: make functionality to select abilities on the heroes and always visualise the selected one in front of the selected hero (turn off when not selected)
 
         //Add -90 degrees to the simulated rotation and apply that rotation to either the hero or the last visualiser
@@ -137,13 +146,13 @@ namespace FutureGames.JRPG_Rocket
             SimulatedRotation *= Quaternion.Euler(0, -90, 0);
             ApplySimulatedRotation();
         }
-        
+
         public void RotateRight()
         {
             SimulatedRotation *= Quaternion.Euler(0, 90, 0);
             ApplySimulatedRotation();
         }
-        
+
         private void Move(Vector3 pAmount)
         {
             gameObject.transform.position += pAmount;
