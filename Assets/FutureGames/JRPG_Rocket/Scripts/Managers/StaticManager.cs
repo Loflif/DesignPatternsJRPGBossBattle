@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace FutureGames.JRPG_Rocket
 {
+    //Generic abstract Singleton that you can inherit from and specify what type it is
+    //T is the class that you want to be made a singleton, which has to be a MonoBehaviour
     public abstract class StaticManager<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T actualInstance;

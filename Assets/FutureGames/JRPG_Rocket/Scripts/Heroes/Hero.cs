@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -8,41 +7,42 @@ namespace FutureGames.JRPG_Rocket
 {
     public struct Command
     {
-        public Command(Action pAction, GameObject pActionVisualizer, Vector3 pMovementChange = default)
+        public Command(Action pAction, GameObject pActionVisualizer)
         {
             Action           = pAction;
             ActionVisualizer = pActionVisualizer;
-            Movement         = pMovementChange;
         }
 
         public Action     Action;
-        public Vector3    Movement;
         public GameObject ActionVisualizer;
     }
 
     public abstract class Hero : MonoBehaviour
     {
-        [SerializeField] protected float      MoveDistance            = 1f;
-        [SerializeField] protected int        CommandMax              = 4;
-        [SerializeField] protected GameObject MoveVisualizer          = null;
-        [SerializeField] protected GameObject AttackVisualizer        = null;
-        [SerializeField] protected Attack     CurrentlySelectedAttack = null;
+        [SerializeField] protected float      MoveDistance   = 1f;
+        [SerializeField] protected int        CommandMax     = 4;
+        [SerializeField] protected GameObject MoveVisualizer = null;
+        [SerializeField] protected Attack     HeroAttack     = null;
 
-        private          Vector3          SimulatedPosition = Vector3.zero;
-        private          Quaternion       SimulatedRotation = Quaternion.identity;
-        private readonly List<Command>    Commands          = new List<Command>();
-        private readonly List<GameObject> AttackVisualizers = new List<GameObject>();
+        private List<Command> Commands                    = new List<Command>();
+        private GameObject    CurrentAttackVisualiser     = null;
+        private Transform     CurrentlySimulatedTransform = null;
+        private Transform     OwnTransform;
+
+
+        private void Awake()
+        {
+            OwnTransform                = transform;
+            CurrentlySimulatedTransform = OwnTransform;
+        }
 
         private void Start()
         {
-            SimulatedPosition                        = transform.position;
-            GameObject startAttackVisualiser = PlaceAttackVisualiser(CurrentlySelectedAttack.AttackVisualiser,
-                CurrentlySelectedAttack.AttackOffset, SimulatedRotation);
-        }
-
-        private void AddCommand(Command pCommand)
-        {
-            Commands.Add(pCommand);
+            CurrentAttackVisualiser = GetActionVisualiser(HeroAttack.AttackVisualiser,
+                CurrentlySimulatedTransform.position + HeroAttack.AttackOffset,
+                CurrentlySimulatedTransform.rotation);
+            CurrentAttackVisualiser.transform.SetParent(CurrentlySimulatedTransform, true);
+            CurrentAttackVisualiser.SetActive(false);
         }
 
         public void RemoveLastCommand()
@@ -53,9 +53,9 @@ namespace FutureGames.JRPG_Rocket
             Command unWantedCommand = Commands[lastIndex];
             Commands.RemoveAt(lastIndex);
             unWantedCommand.ActionVisualizer.SetActive(false);
-            SimulatedPosition -= unWantedCommand.Movement;
-            if (Commands.Count == 0)
-                SimulatedRotation = transform.rotation;
+            SetSimulatedTransform(Commands.Count > 0
+                ? Commands[Commands.Count - 1].ActionVisualizer.transform
+                : OwnTransform);
         }
 
         public void ExecuteCommands()
@@ -64,12 +64,18 @@ namespace FutureGames.JRPG_Rocket
             {
                 c.Action();
                 c.ActionVisualizer.SetActive(false);
-                //TODO: execute commands slowly
             }
 
             Commands.Clear();
-            SimulatedPosition  = transform.position;
-            transform.rotation = SimulatedRotation;
+            OwnTransform.rotation = CurrentlySimulatedTransform.rotation;
+            OwnTransform.position = CurrentlySimulatedTransform.position;
+            SetSimulatedTransform(OwnTransform);
+        }
+
+        private void SetSimulatedTransform(Transform pToSimulate)
+        {
+            CurrentlySimulatedTransform = pToSimulate;
+            CurrentAttackVisualiser.transform.SetParent(CurrentlySimulatedTransform, false);
         }
 
         private bool PointIsOnGrid(Vector3 pPoint)
@@ -84,28 +90,9 @@ namespace FutureGames.JRPG_Rocket
             return Commands.Count < CommandMax;
         }
 
-        private GameObject PlaceAttackVisualiser(GameObject pAttackVisualiser, Vector3 pPosition, Quaternion pRotation)
+        private GameObject GetActionVisualiser(GameObject pVisualiser, Vector3 pPosition, Quaternion pRotation)
         {
-            return ObjectPoolManager.GetPooledObject(pAttackVisualiser, pPosition, pRotation);
-        }
-
-        private void SimulateMovement(Command pCommand)
-        {
-            SimulatedPosition += pCommand.Movement;
-        }
-
-        private GameObject GetCommandVisualiser(GameObject pVisualiser, Vector3 pCommandMovement = default)
-        {
-            return ObjectPoolManager.GetPooledObject(pVisualiser, SimulatedPosition + pCommandMovement,
-                SimulatedRotation);
-        }
-
-        private void ApplySimulatedRotation()
-        {
-            if (Commands.Count > 0)
-                Commands[Commands.Count - 1].ActionVisualizer.transform.rotation = SimulatedRotation;
-            else
-                transform.rotation = SimulatedRotation;
+            return ObjectPoolManager.GetPooledObject(pVisualiser, pPosition, pRotation);
         }
 
         //Check whether the hero has any actions left this round, otherwise don't do anything
@@ -118,16 +105,19 @@ namespace FutureGames.JRPG_Rocket
         {
             if (!HasActionsLeft())
                 return;
-            Vector3 moveVector = SimulatedRotation * (pDirection * MoveDistance * GameManager.GridSize);
+            Vector3 moveVector = CurrentlySimulatedTransform.rotation *
+                                 (pDirection * MoveDistance * GameManager.GridSize);
 
-            if (!PointIsOnGrid(SimulatedPosition + moveVector))
+            if (!PointIsOnGrid(CurrentlySimulatedTransform.position + moveVector))
                 return;
 
             void MoveAction() => Move(moveVector);
-            GameObject newVisualiser = GetCommandVisualiser(MoveVisualizer, moveVector);
-            Command    newCommand    = new Command(MoveAction, newVisualiser, moveVector);
-            SimulateMovement(newCommand);
-            AddCommand(newCommand);
+            GameObject moveVisualiser =
+                GetActionVisualiser(MoveVisualizer, CurrentlySimulatedTransform.position + moveVector,
+                    CurrentlySimulatedTransform.rotation);
+            Command move = new Command(MoveAction, moveVisualiser);
+            SetSimulatedTransform(moveVisualiser.transform);
+            Commands.Add(move);
         }
 
         public virtual void QueueAttack()
@@ -135,22 +125,29 @@ namespace FutureGames.JRPG_Rocket
             if (!HasActionsLeft())
                 return;
 
-            // void AttackAction() => Attack();
+            Vector3   pos       = CurrentlySimulatedTransform.position;
+            Vector3   hitBox    = HeroAttack.AttackHitBox;
+            Vector3   offset    = CurrentlySimulatedTransform.rotation * HeroAttack.AttackOffset;
+            float     damage    = HeroAttack.Damage;
+            LayerMask hitLayers = HeroAttack.HitLayers;
+            void AttackAction() => Attack(pos, offset, hitBox, damage, CurrentlySimulatedTransform.rotation, hitLayers);
+            GameObject attackVisualiser = GetActionVisualiser(HeroAttack.AttackVisualiser,
+                pos + offset,
+                CurrentlySimulatedTransform.rotation);
+            Command attack = new Command(AttackAction, attackVisualiser);
+            Commands.Add(attack);
         }
 
-        //TODO: make functionality to select abilities on the heroes and always visualise the selected one in front of the selected hero (turn off when not selected)
-
-        //Add -90 degrees to the simulated rotation and apply that rotation to either the hero or the last visualiser
-        public void RotateLeft()
+        public void ToggleAttackVisualiser(bool pEnable)
         {
-            SimulatedRotation *= Quaternion.Euler(0, -90, 0);
-            ApplySimulatedRotation();
+            CurrentAttackVisualiser.SetActive(pEnable);
         }
 
-        public void RotateRight()
+        public void Rotate(Vector3 pAxis, float pDegrees)
         {
-            SimulatedRotation *= Quaternion.Euler(0, 90, 0);
-            ApplySimulatedRotation();
+            CurrentlySimulatedTransform.Rotate(pAxis, pDegrees);
+            HeroAttack.AttackVisualiser.transform.RotateAround(CurrentlySimulatedTransform.position, pAxis,
+                pDegrees);
         }
 
         private void Move(Vector3 pAmount)
@@ -158,9 +155,16 @@ namespace FutureGames.JRPG_Rocket
             gameObject.transform.position += pAmount;
         }
 
-        private void Attack(Attack pAttack)
+        private void Attack(Vector3 pPosition, Vector3 pOffset, Vector3 pHitBox, float pDamage, Quaternion pOrientation,
+            LayerMask               pHitLayers)
         {
-            //TODO: make attack scriptableObjects that specify size and damage and somehow damage things in that area (BoxCast?)
+            Vector3 halfExtents = pHitBox * 0.5f;
+            Vector3 direction   = (pOffset).normalized;
+            if (Physics.BoxCast(pPosition, halfExtents, direction, out RaycastHit hit, Quaternion.identity, pOffset.magnitude,
+                pHitLayers))
+            {
+                hit.transform.GetComponent<Enemy>().TakeDamage(pDamage);
+            }
         }
     }
 }

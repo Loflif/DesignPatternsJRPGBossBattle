@@ -17,7 +17,12 @@ namespace FutureGames.JRPG_Rocket
         {
             Heroes                = FindObjectsOfType<Hero>();
             SelectorObject        = transform.GetChild(0);
+        }
+
+        private void Start()
+        {
             CurrentlySelectedHero = Heroes[CurrentHeroIndex];
+            CurrentlySelectedHero.ToggleAttackVisualiser(true);
             MoveSelector(CurrentlySelectedHero.transform);
             StartCoroutine(SelectorBob());
         }
@@ -26,8 +31,10 @@ namespace FutureGames.JRPG_Rocket
         {
             if (CurrentHeroIndex >= Heroes.Length - 1)
                 return;
+            CurrentlySelectedHero.ToggleAttackVisualiser(false);
             CurrentHeroIndex      += 1;
             CurrentlySelectedHero =  Heroes[CurrentHeroIndex];
+            CurrentlySelectedHero.ToggleAttackVisualiser(true);
             MoveSelector(CurrentlySelectedHero.transform);
         }
 
@@ -35,8 +42,10 @@ namespace FutureGames.JRPG_Rocket
         {
             if (CurrentHeroIndex == 0)
                 return;
+            CurrentlySelectedHero.ToggleAttackVisualiser(false);
             CurrentHeroIndex      -= 1;
             CurrentlySelectedHero =  Heroes[CurrentHeroIndex];
+            CurrentlySelectedHero.ToggleAttackVisualiser(true);
             MoveSelector(CurrentlySelectedHero.transform);
         }
 
@@ -81,14 +90,9 @@ namespace FutureGames.JRPG_Rocket
             CurrentlySelectedHero.QueueAttack();
         }
 
-        public void RotateHeroLeft()
+        public void RotateHero(Vector3 pAxis, float pDegrees)
         {
-            CurrentlySelectedHero.RotateLeft();
-        }  
-        public void RotateHeroRight()
-        {
-            CurrentlySelectedHero.RotateRight();
+            CurrentlySelectedHero.Rotate(pAxis, pDegrees);
         }
-        
     }
 }

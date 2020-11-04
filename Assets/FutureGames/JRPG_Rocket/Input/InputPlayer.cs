@@ -37,6 +37,7 @@ namespace FutureGames.JRPG_Rocket
             Input.PlayerOne.RemoveLastCommand.performed  += RemoveLastCommand;
             Input.PlayerOne.RotateLeft.performed         += RotateHeroLeft;
             Input.PlayerOne.RotateRight.performed        += RotateHeroRight;
+            Input.PlayerOne.Attack.performed             += SendAttackCommand;
         }
 
         private void UnbindInput()
@@ -50,6 +51,7 @@ namespace FutureGames.JRPG_Rocket
             Input.PlayerOne.RemoveLastCommand.performed  -= RemoveLastCommand;
             Input.PlayerOne.RotateLeft.performed         -= RotateHeroLeft;
             Input.PlayerOne.RotateRight.performed        -= RotateHeroRight;
+            Input.PlayerOne.Attack.performed             -= SendAttackCommand;
         }
 
         private void SendMoveForwardsCommand(InputAction.CallbackContext pContext)
@@ -79,12 +81,12 @@ namespace FutureGames.JRPG_Rocket
 
         private void RotateHeroLeft(InputAction.CallbackContext pContext)
         {
-            HeroManager.Instance.RotateHeroLeft();
+            HeroManager.Instance.RotateHero(Vector3.up, -90.0f);
         }
 
         private void RotateHeroRight(InputAction.CallbackContext pContext)
         {
-            HeroManager.Instance.RotateHeroRight();
+            HeroManager.Instance.RotateHero(Vector3.up, 90.0f);
         }
 
         private void RemoveLastCommand(InputAction.CallbackContext pContext)
@@ -104,7 +106,7 @@ namespace FutureGames.JRPG_Rocket
                 HeroManager.Instance.SelectPreviousHero();
             }
         }
-
+        
         private void ExecuteCommands(InputAction.CallbackContext pContext)
         {
             HeroManager.Instance.ExecuteAllHeroCommands();

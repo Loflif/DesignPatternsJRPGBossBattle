@@ -9,6 +9,6 @@ namespace FutureGames.JRPG_Rocket
         public Vector3    AttackHitBox     = new Vector3(1, 1, 1);
         public float      Damage           = 1.0f;
         public GameObject AttackVisualiser = null;
-        //TODO: add ailment scriptableObjects? :)
+        public LayerMask  HitLayers;
     }   
 }
